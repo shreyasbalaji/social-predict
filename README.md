@@ -1,3 +1,7 @@
+# Social Predict
+## This is a site hosted on Github Pages. This project, built at HackMIT 2018, aims to provide an inline like-prediction and social-network optimization to users as the post on common social media platforms like Instagram, Facebook, and Twitter.
+
+# Github Pages Stock Info
 ## Welcome to GitHub Pages
 
 You can use the [editor on GitHub](https://github.com/shreyasbalaji/social-predict/edit/gh-pages/README.md) to maintain and preview the content for your website in Markdown files.
