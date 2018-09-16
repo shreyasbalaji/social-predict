@@ -19,7 +19,7 @@ def process_json(filename):
             day,
             hour/24,
             followers/250,
-            liked_by/followers
+            liked_by/(followers+1)
         )
 
 
