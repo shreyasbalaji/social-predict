@@ -2,6 +2,7 @@ import os
 import numpy as np
 # import tensorflow as tf
 import json
+import re
 from multiprocessing import Pool
 from collections import namedtuple
 from PIL import Image
@@ -11,18 +12,23 @@ import requests
 import subprocess
 
 
-MAX_SIZE = 1000
+MAX_SIZE = 500
 root_dir = os.path.dirname(__file__)
-SerializeInfo = namedtuple('SerializeInfo', ['input_file', 'output_file'])
+SerializeInfo = namedtuple('SerializeInfo', ['input_file', 'input_json', 'output_prefix'])
 
 
 def serialize_image(info):
     try:
         img = Image.open(info.input_file)
         img = img.resize((300, 300), Image.ANTIALIAS)
-        img.save(info.output_file, "JPEG")
-    except IOError:
+        img.save(f'{info.output_prefix}.jpg', "JPEG")
+        os.rename(info.input_json, f'{info.output_prefix}.json')
+        os.remove(info.input_file)
+    except IOError as e:
+        print(e)
         print("Could not resize image")
+        print(info.input_json)
+        print(f'{info.output_prefix}.json')
     return None
 
 def serialize_images(input_dir, output_dir):
@@ -45,18 +51,27 @@ def serialize_images(input_dir, output_dir):
     fnames = list(os.listdir(input_dir))
     infos = []
     for fname in fnames:
-        if fname[-4:] == '.jpg':
+        if fname[-4:] == '.mp4':
+            os.remove(os.path.join(input_dir, fname))
+        elif fname[-4:] == '.jpg':
+            test_search = re.search('\d+.jpg', fname)
+            if test_search:
+                os.remove(os.path.join(input_dir, fname))
+                continue
+            else:
+                fname_prefix = fname[:-4]
+
             # print(fname)
             with open(os.path.join(odir, 'meta.json'), 'r') as f:
                 csize = json.load(f)['size']
             if csize >= MAX_SIZE:
-                current_id = int(fname[:4].lstrip('0'))
+                current_id = int(odir[-4:].lstrip('0'))
                 fid = "%04d" % (current_id + 1)
                 odir = os.path.join(output_dir, f'tff{fid}')
                 if not os.path.exists(odir):
                     os.makedirs(odir)
                 if not os.path.exists(os.path.join(odir, 'meta.json')):
-                    with open(os.path.join(odir, 'meta.json'), 'r') as f:
+                    with open(os.path.join(odir, 'meta.json'), 'w') as f:
                         json.dump({'size': 0}, f)
                 with open(os.path.join(odir, 'meta.json')) as f:
                     csize = json.load(f)['size']
@@ -65,8 +80,8 @@ def serialize_images(input_dir, output_dir):
             jpg_prefix = "%04d" % csize
             infos.append(SerializeInfo(
                 os.path.join(input_dir, fname),
-                os.path.join(odir, f'{jpg_prefix}.jpg')))
-
+                os.path.join(input_dir, f'{fname_prefix}.json'),
+                os.path.join(odir, f'{jpg_prefix}')))
 
             with open(os.path.join(odir, 'meta.json'), 'w') as f:
                 json.dump({'size': csize}, f)
@@ -74,7 +89,7 @@ def serialize_images(input_dir, output_dir):
     pool = Pool(4)
     pool.map(serialize_image, infos)
 
-# serialize_images(os.path.join(root_dir, 'eeifshemaisrael'), os.path.join(root_dir, 'data'))
+serialize_images(os.path.join(root_dir, 'selfies'), os.path.join(root_dir, 'data'))
 
 def process_json(filename):
     with open(filename) as f:
