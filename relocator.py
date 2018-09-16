@@ -7,8 +7,6 @@ from multiprocessing import Pool
 from collections import namedtuple
 from PIL import Image
 import json
-import requests
-import subprocess
 
 
 MAX_SIZE = 500

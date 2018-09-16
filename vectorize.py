@@ -1,31 +1,36 @@
 from datetime import datetime
 import json
+import requests
+import subprocess
 
 def process_json(filename):
     with open(filename) as f:
         data = json.load(f)
     caption = data["node"]["edge_media_to_caption"]["edges"][0]["node"]["text"]
-    day, hour = convert_time(data["node"]["taken_at_timestamp"])
+    day, hour = convert_time(data["node"]["taken_at_timestamp"], caption)
     liked_by = data["node"]["edge_liked_by"]["count"]
     followers = int(get_followers(data["node"]["owner"]["id"]))
-    return get_feature_vector(
-            caption,
-            day,
-            hour,
-            followers,
-            liked_by
-        )
-    return [caption, day, hour, liked_by, followers]
+    return get_feature_vector(caption, day, hour, followers, liked_by)
 
 
-def convert_time(time):
+def convert_time(time, caption):
     days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+    hashtags = ['#nycselfie', '#laselfie', '#bostonselfie', '#londonselfie', '#parisselfie', '#caliselfie', '#chicagoselfie']
+    timezone_change = [-4, -7, -4, 1, 2, -7, -5]
     week_day = datetime.utcfromtimestamp(time).strftime('%A')
     hour_day = int(datetime.utcfromtimestamp(time).strftime('%H'))
 
+    for i in range(len(hashtags)):
+        if hashtags[i] in caption:
+            break
+
+    change_day = (hour_day + timezone_change[i])//24
+    hour_day = (hour_day + timezone_change[i]) % 24
     vector_day = []
-    for i in days:
-        if i == week_day:
+    day_index = (days.index(week_day) + change_day) % 7
+
+    for i in range(7):
+        if i == day_index:
             vector_day.append(1)
         else:
             vector_day.append(0)
@@ -39,7 +44,6 @@ def get_followers(user_id):
     follower_count = requests.get("https://www.instagram.com/web/search/topsearch/?query={" + username + "}").json()["users"][0]["user"]["follower_count"]
     return follower_count
 
+
 def get_feature_vector(elements):
 
-
-# print(process_json("eeifshemaisrael/2017-04-11_22-21-37_UTC.json"))
