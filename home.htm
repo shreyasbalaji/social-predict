@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<!-- saved from url=(0057)http://www.jasny.net/bootstrap/examples/starter-template/ -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="http://www.jasny.net/bootstrap/docs-assets/ico/favicon.png">
+
+    <title>Starter Template for Bootstrap</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="./Starter Template for Bootstrap_files/bootstrap.min.css" rel="stylesheet">
+    <link href="./Starter Template for Bootstrap_files/jasny-bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="./Starter Template for Bootstrap_files/starter-template.css" rel="stylesheet">
+
+    <!-- Just for debugging purposes. Don't actually copy this line! -->
+    <!--[if lt IE 9]><script src="../../docs-assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+    <style>
+* {
+    box-sizing: border-box;
+}
+
+/* Create two equal columns that floats next to each other */
+.column {
+    float: left;
+    width: 50%;
+    padding: 10px;
+    height: 300px; /* Should be removed. Only for demonstration */
+}
+
+/* Clear floats after the columns */
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+</style>
+  
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  </head>
+
+  <body style="">
+
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="http://www.jasny.net/bootstrap/examples/starter-template/#">Like Up</a>
+        </div>
+        <div class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="http://www.jasny.net/bootstrap/examples/starter-template/#">Home</a></li>
+            <li><a href="about.htm">About</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+
+    <div class="container">
+      <div class='row'>
+        <div class="column">
+          <h1>Number of likes</h1>
+          <p class="lead">Upload a selfie and some basic information to know how many likes you will get!<br></p>
+            <form id="myform">
+              <fieldset>
+              <label>Caption: </label>
+              <input type="text" id="caption" placeholder="#selfie"> <br>
+              <label>Post Day: </label>
+              <select id="day">
+                <option>Sunday</option>
+                <option>Monday</option>
+                <option>Tuesday</option>
+                <option>Wednesday</option>
+                <option>Thursday</option>
+                <option>Friday</option>
+                <option>Saturday</option>
+              </select> <br>
+              <label>Post Time: </label>
+              <input type="text" id="time" placeholder="15 aka 3pm: submit int"> <br>
+              <label>Number of followers: </label>
+              <input type="text" id="followers" placeholder="420"> <br>
+              <p>
+                <button class="btn btn-primary" type="button" onclick="doFunction()">Submit
+                  <script type="text/javascript">
+                    function doFunction() {
+                      var input = document.getElementById('picture');
+                      var fd = new FormData();    
+                      fd.append('file', input.files[0], 'picture.jpg');
+                      fd.append('caption', document.getElementById('caption').value)
+                      fd.append('day', document.getElementById('day').value);
+                      fd.append('hour', document.getElementById('time').value)
+                      fd.append('followers', document.getElementById('followers').value);
+
+                      $.ajax({
+                        url: 'http://137.117.39.47/api/regress',
+                        data: fd,
+                        processData: false,
+                        contentType: false,
+                        type: 'POST',
+                        success: function(data){
+                          alert(data);
+                        }
+                      });
+                    }
+                  </script>
+                </button>
+              </p>
+            </fieldset>
+          </form> 
+        </div>
+        
+        <div class="column">
+          <h2>Selfie</h2>
+          <div class="fileinput fileinput-new" data-provides="fileinput">
+            <div class="fileinput-new thumbnail" style="width: 500px; height: 500px;">
+              <img data-src="holder.js/100%x100%" alt="...">
+            </div>
+            <div class="fileinput-preview fileinput-exists thumbnail" style="max-width: 500px; max-height: 500px;"></div>
+            <div>
+                <span class="btn btn-default btn-file"><span class="fileinput-new">Select image</span><span class="fileinput-exists">Change</span><input type="file" id="picture" name="selfie"></span>
+                <a href="#" class="btn btn-default fileinput-exists" data-dismiss="fileinput">Remove</a>
+            </div>
+        </div>
+      </div>
+    </div><!-- /.container -->
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="./Starter Template for Bootstrap_files/jquery-1.10.2.min.js"></script>
+    <script src="./Starter Template for Bootstrap_files/bootstrap.min.js"></script>
+    <script src="./Starter Template for Bootstrap_files/jasny-bootstrap.min.js"></script>
+  
+
+</body></html>
