@@ -3,6 +3,7 @@ from vectorize import get_feature_vector
 import scipy.ndimage
 from PIL import Image
 from random import random
+import numpy as np
 
 app = Flask(__name__)
 imn = np.load('image_mean.npy')
@@ -52,7 +53,7 @@ def crossdomain(origin=None, methods=None, headers=None,
 
 @app.route('/api/regress', methods=['POST']):
 @crossdomain(origin='*')
-def regress()
+def regress():
     caption = request.form['caption']
     followers = int(request.form['followers'])
     hour = int(request.form['hour'])
