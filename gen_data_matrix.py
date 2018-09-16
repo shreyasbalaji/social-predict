@@ -14,7 +14,7 @@ def save_data_files(rootdir):
         matrix = []
         for s, di, f in os.walk(rootdir + "/" + d):
             for a in f:
-                if a.endswith(".json"):
+                if a.endswith(".json") and (not a.startswith("meta")):
                     row = np.array(vec.process_json(os.path.join(rootdir, d, a)))
                     matrix.append(row)
 

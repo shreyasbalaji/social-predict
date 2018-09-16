@@ -1,16 +1,17 @@
 import os
-import scipy
+import numpy as np
+import scipy.ndimage
 from gen_data_matrix import load_data_matrix
 
-pwd = os.dirname(__file__)
+pwd = os.path.dirname(__file__)
 
 def load(dirname):
     data_matrix = load_data_matrix(dirname)
     n = data_matrix.shape[0]
-    image_tensor = np.empty((n, 300, 300, 3), dtype=uint8)
-    nid = "%04s" % n
+    image_tensor = np.empty((n, 300, 300, 3), dtype=np.uint8)
     for i in range(n):
-        fname = os.path.join(dirname, f'{nid}.jpg')
+        iid = "%04d" % (i+1)
+        fname = os.path.join(dirname, f'{iid}.jpg')
         image_tensor[i] = scipy.ndimage.imread(fname)
     return (image_tensor, data_matrix)
 
@@ -18,9 +19,10 @@ def load(dirname):
 def stats(dirname):
     data_matrix = load_data_matrix(dirname)
     n = data_matrix.shape[0]
-    image_tensor = np.empty((n, 300, 300, 3), dtype=uint8)
-    nid = "%04s" % n
+    print(n)
+    image_tensor = np.empty((n, 300, 300, 3), dtype=np.uint8)
     for i in range(n):
-        fname = os.path.join(dirname, f'{nid}.jpg')
+        iid = "%04d" % (i+1)
+        fname = os.path.join(dirname, f'{iid}.jpg')
         image_tensor[i] = scipy.ndimage.imread(fname)
     return (np.mean(image_tensor, axis=0), np.stdev(image_tensor, axis=0))
