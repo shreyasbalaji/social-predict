@@ -4,6 +4,8 @@ import scipy.ndimage
 from gen_data_matrix import load_data_matrix
 
 pwd = os.path.dirname(__file__)
+imn = np.load('image_mean.npy')
+isd = np.load('image_std.npy')
 
 def load(dirname):
     data_matrix = load_data_matrix(dirname)
@@ -12,9 +14,8 @@ def load(dirname):
     for i in range(n):
         iid = "%04d" % (i+1)
         fname = os.path.join(dirname, f'{iid}.jpg')
-        image_tensor[i] = scipy.ndimage.imread(fname)
+        image_tensor[i] = (scipy.ndimage.imread(fname) - imn) / isd
     return (image_tensor, data_matrix)
-
 
 def stats(dirname):
     data_matrix = load_data_matrix(dirname)
@@ -25,4 +26,4 @@ def stats(dirname):
         iid = "%04d" % (i+1)
         fname = os.path.join(dirname, f'{iid}.jpg')
         image_tensor[i] = scipy.ndimage.imread(fname)
-    return (np.mean(image_tensor, axis=0), np.stdev(image_tensor, axis=0))
+    return (np.mean(image_tensor, axis=0), np.std(image_tensor, axis=0))
