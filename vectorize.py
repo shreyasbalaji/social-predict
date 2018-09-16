@@ -1,5 +1,7 @@
 from datetime import datetime
 import json
+import requests
+import subprocess
 import numpy as np
 
 def process_json(filename):
@@ -39,7 +41,6 @@ def get_followers(user_id):
     follower_count = requests.get("https://www.instagram.com/web/search/topsearch/?query={" + username + "}").json()["users"][0]["user"]["follower_count"]
     return follower_count
 
+
 def get_feature_vector(caption, day, hour, followers, liked_by):
     return np.array([followers, hour, *day, liked_by], dtype=np.float32) 
-    
-
