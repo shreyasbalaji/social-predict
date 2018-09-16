@@ -1,5 +1,6 @@
 from datetime import datetime
 import json
+import numpy as np
 
 def process_json(filename):
     with open(filename) as f:
@@ -15,7 +16,6 @@ def process_json(filename):
             followers,
             liked_by
         )
-    return [caption, day, hour, liked_by, followers]
 
 
 def convert_time(time):
@@ -39,7 +39,7 @@ def get_followers(user_id):
     follower_count = requests.get("https://www.instagram.com/web/search/topsearch/?query={" + username + "}").json()["users"][0]["user"]["follower_count"]
     return follower_count
 
-def get_feature_vector(elements):
+def get_feature_vector(caption, day, hour, followers, liked_by):
+    return np.array([followers, hour, *day, liked_by], dtype=np.float32) 
+    
 
-
-# print(process_json("eeifshemaisrael/2017-04-11_22-21-37_UTC.json"))
