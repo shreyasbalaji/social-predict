@@ -37,9 +37,8 @@ def process_json(filename):
 
 def convert_time(time, caption, fake=False):
     if fake:
-        week_day = 'Sunday'
+        day_index = 0
         hour_day = 12
-        timezone_index = 0
     else:
         days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
         hashtags = ['#nycselfie', '#laselfie', '#bostonselfie', '#londonselfie', '#parisselfie', '#caliselfie',
@@ -47,22 +46,15 @@ def convert_time(time, caption, fake=False):
         timezone_change = [-4, -7, -4, 1, 2, -7, -5]
         week_day = datetime.utcfromtimestamp(time).strftime('%A')
         hour_day = int(datetime.utcfromtimestamp(time).strftime('%H'))
-    days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-        week_day = 'Sunday'
-        hour_day = 12
+
         timezone_index = 0
         for i in range(len(hashtags)):
             if hashtags[i] in caption:
                 timezone_index = i
                 break
-
-    change_day = (hour_day + timezone_change[timezone_index]) // 24
-    hour_day = (hour_day + timezone_change[timezone_index]) % 24
-    day_index = (change_day + days.index(week_day)) % 7
-    for i in range(len(hashtags)):
-        if hashtags[i] in caption:
-            timezone_index = i
-            break
+        change_day = (hour_day + timezone_change[timezone_index]) // 24
+        hour_day = (hour_day + timezone_change[timezone_index]) % 24
+        day_index = (change_day + days.index(week_day)) % 7
 
     vector_day = []
 
@@ -87,3 +79,5 @@ def get_feature_vector(caption, day, hour, followers, liked_by_perc):
             nlp('caption ' + str(caption)).vector,
             np.array([followers, hour, *day, liked_by_perc], dtype=np.float32)
         ))
+
+print(process_json("eeifshemaisrael/2017-04-11_22-21-37_UTC.json"))
