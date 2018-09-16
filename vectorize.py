@@ -10,10 +10,22 @@ nlp = spacy.load('en')
 def process_json(filename):
     with open(filename) as f:
         data = json.load(f)
-    caption = data["node"]["edge_media_to_caption"]["edges"][0]["node"]["text"]
-    day, hour = convert_time(data["node"]["taken_at_timestamp"], caption)
-    liked_by = data["node"]["edge_liked_by"]["count"]
-    followers = int(get_followers(data["node"]["owner"]["id"]))
+    try:
+        caption = data["node"]["edge_media_to_caption"]["edges"][0]["node"]["text"]
+    except Exception:
+        caption = ""
+    try:
+        day, hour = convert_time(data["node"]["taken_at_timestamp"], caption)
+    except Exception:
+        day, hour = convert_time(None, caption, fake=True)
+    try:
+        liked_by = data["node"]["edge_liked_by"]["count"]
+    except Exception:
+        liked_by = 100
+    try:
+        followers = int(get_followers(data["node"]["owner"]["id"]))
+    except Exception:
+        followers = 100
     return get_feature_vector(
             caption,
             day,
@@ -23,23 +35,35 @@ def process_json(filename):
         )
 
 
-def convert_time(time, caption):
+def convert_time(time, caption, fake=False):
+    if fake:
+        week_day = 'Sunday'
+        hour_day = 12
+        timezone_index = 0
+    else:
+        days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+        hashtags = ['#nycselfie', '#laselfie', '#bostonselfie', '#londonselfie', '#parisselfie', '#caliselfie',
+                     '#chicagoselfie']
+        timezone_change = [-4, -7, -4, 1, 2, -7, -5]
+        week_day = datetime.utcfromtimestamp(time).strftime('%A')
+        hour_day = int(datetime.utcfromtimestamp(time).strftime('%H'))
     days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-    hashtags = ['#nycselfie', '#laselfie', '#bostonselfie', '#londonselfie', '#parisselfie', '#caliselfie',
-                 '#chicagoselfie']
-    timezone_change = [-4, -7, -4, 1, 2, -7, -5]
-    week_day = datetime.utcfromtimestamp(time).strftime('%A')
-    hour_day = int(datetime.utcfromtimestamp(time).strftime('%H'))
+        week_day = 'Sunday'
+        hour_day = 12
+        timezone_index = 0
+        for i in range(len(hashtags)):
+            if hashtags[i] in caption:
+                timezone_index = i
+                break
 
-    timezone_index = 0
+    change_day = (hour_day + timezone_change[timezone_index]) // 24
+    hour_day = (hour_day + timezone_change[timezone_index]) % 24
+    day_index = (change_day + days.index(week_day)) % 7
     for i in range(len(hashtags)):
         if hashtags[i] in caption:
             timezone_index = i
             break
 
-    change_day = (hour_day + timezone_change[timezone_index]) // 24
-    hour_day = (hour_day + timezone_change[timezone_index]) % 24
-    day_index = (change_day + days.index(week_day)) % 7
     vector_day = []
 
     for i in range(7):
@@ -60,6 +84,6 @@ def get_followers(user_id):
 
 def get_feature_vector(caption, day, hour, followers, liked_by_perc):
     return np.concatenate((
-            nlp(caption).vector,
+            nlp('caption ' + str(caption)).vector,
             np.array([followers, hour, *day, liked_by_perc], dtype=np.float32)
         ))
