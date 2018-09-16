@@ -14,9 +14,9 @@ def process_json(filename):
     return get_feature_vector(
             caption,
             day,
-            hour,
-            followers,
-            liked_by
+            hour/24,
+            followers/250,
+            liked_by/followers
         )
 
 
@@ -42,5 +42,5 @@ def get_followers(user_id):
     return follower_count
 
 
-def get_feature_vector(caption, day, hour, followers, liked_by):
-    return np.array([followers, hour, *day, liked_by], dtype=np.float32) 
+def get_feature_vector(caption, day, hour, followers, liked_by_perc):
+    return np.array([followers, hour, *day, liked_by_perc], dtype=np.float32)
