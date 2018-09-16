@@ -2,6 +2,8 @@ from datetime import datetime
 import json
 import requests
 import subprocess
+import numpy as np
+
 
 def process_json(filename):
     with open(filename) as f:
@@ -10,7 +12,13 @@ def process_json(filename):
     day, hour = convert_time(data["node"]["taken_at_timestamp"], caption)
     liked_by = data["node"]["edge_liked_by"]["count"]
     followers = int(get_followers(data["node"]["owner"]["id"]))
-    return get_feature_vector(caption, day, hour, followers, liked_by)
+    return get_feature_vector(
+            caption,
+            day,
+            hour,
+            followers,
+            liked_by
+        )
 
 
 def convert_time(time, caption):
@@ -20,12 +28,14 @@ def convert_time(time, caption):
     week_day = datetime.utcfromtimestamp(time).strftime('%A')
     hour_day = int(datetime.utcfromtimestamp(time).strftime('%H'))
 
+    index_timezone = 0
     for i in range(len(hashtags)):
         if hashtags[i] in caption:
+            index_timezone = i
             break
 
-    change_day = (hour_day + timezone_change[i])//24
-    hour_day = (hour_day + timezone_change[i]) % 24
+    change_day = (hour_day + timezone_change[index_timezone])//24
+    hour_day = (hour_day + timezone_change[index_timezone]) % 24
     vector_day = []
     day_index = (days.index(week_day) + change_day) % 7
 
@@ -45,5 +55,5 @@ def get_followers(user_id):
     return follower_count
 
 
-def get_feature_vector(elements):
-
+def get_feature_vector(caption, day, hour, followers, liked_by):
+    return np.array([followers, hour, *day, liked_by], dtype=np.float32) 
