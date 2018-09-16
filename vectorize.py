@@ -3,6 +3,9 @@ import json
 import requests
 import subprocess
 import numpy as np
+import spacy
+
+nlp = spacy.load('en')
 
 def process_json(filename):
     with open(filename) as f:
@@ -43,4 +46,7 @@ def get_followers(user_id):
 
 
 def get_feature_vector(caption, day, hour, followers, liked_by_perc):
-    return np.array([followers, hour, *day, liked_by_perc], dtype=np.float32)
+    return np.concatenate((
+            nlp(caption).vector,
+            np.array([followers, hour, *day, liked_by_perc], dtype=np.float32)
+        ))
