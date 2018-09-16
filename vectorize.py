@@ -11,7 +11,7 @@ def process_json(filename):
     with open(filename) as f:
         data = json.load(f)
     caption = data["node"]["edge_media_to_caption"]["edges"][0]["node"]["text"]
-    day, hour = convert_time(data["node"]["taken_at_timestamp"])
+    day, hour = convert_time(data["node"]["taken_at_timestamp"], caption)
     liked_by = data["node"]["edge_liked_by"]["count"]
     followers = int(get_followers(data["node"]["owner"]["id"]))
     return get_feature_vector(
@@ -23,14 +23,27 @@ def process_json(filename):
         )
 
 
-def convert_time(time):
+def convert_time(time, caption):
     days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+    hashtags = ['#nycselfie', '#laselfie', '#bostonselfie', '#londonselfie', '#parisselfie', '#caliselfie',
+                 '#chicagoselfie']
+    timezone_change = [-4, -7, -4, 1, 2, -7, -5]
     week_day = datetime.utcfromtimestamp(time).strftime('%A')
     hour_day = int(datetime.utcfromtimestamp(time).strftime('%H'))
 
+    timezone_index = 0
+    for i in range(len(hashtags)):
+        if hashtags[i] in caption:
+            timezone_index = i
+            break
+
+    change_day = (hour_day + timezone_change[timezone_index]) // 24
+    hour_day = (hour_day + timezone_change[timezone_index]) % 24
+    day_index = (change_day + days.index(week_day)) % 7
     vector_day = []
-    for i in days:
-        if i == week_day:
+
+    for i in range(7):
+        if i == day_index:
             vector_day.append(1)
         else:
             vector_day.append(0)
