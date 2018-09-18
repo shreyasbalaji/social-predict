@@ -3,12 +3,12 @@ from keras import backend as K
 from SP_API.SPCore import SPCore, CKPT_PATH, DATA_PATH
 
 
-def train_SP(X_train_imgs, X_train_attribs, X_train_embs, y_train_labels, epochs=3, bsz=50):
+def train_SP(X_train_imgs, X_train_attribs, X_train_embs, y_train_labels, bsz, learning_rate, ckpt_path, img_dim, epochs):
 
     tf.reset_default_graph()
 
     print('Initiating SPCore ...')
-    core = SPCore()
+    core = SPCore(bsz=bsz, learning_rate=learning_rate, ckpt_path=ckpt_path, img_dim=img_dim)
 
     # Initialize TF Saver
     saver = tf.train.Saver()
@@ -48,6 +48,6 @@ def train_SP(X_train_imgs, X_train_attribs, X_train_embs, y_train_labels, epochs
         # print("Epoch {} Loss {}".format(ep, final_out_loss / num_batches))
 
         # Save Model
-        saver.save(sess, CKPT_PATH)
+        saver.save(sess, ckpt_path)
 
 

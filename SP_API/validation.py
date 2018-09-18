@@ -3,10 +3,10 @@ from keras import backend as K
 from SP_API.SPCore import SPCore, CKPT_PATH, DATA_PATH
 
 
-def validate_SP(X_valid_imgs, X_valid_attribs, X_valid_embs, y_valid_labels, bsz=10):
+def validate_SP(X_valid_imgs, X_valid_attribs, X_valid_embs, y_valid_labels, bsz, learning_rate, ckpt_path, img_dim):
 
     print('Initiating SPCore ...')
-    core = SPCore()
+    core = SPCore(bsz=bsz, learning_rate=learning_rate, ckpt_path=ckpt_path, img_dim=img_dim)
 
 
     # Initialize TF Session
@@ -14,7 +14,7 @@ def validate_SP(X_valid_imgs, X_valid_attribs, X_valid_embs, y_valid_labels, bsz
     K.set_session(sess)
 
     saver = tf.train.Saver()
-    saver.restore(sess, CKPT_PATH)
+    saver.restore(sess, ckpt_path)
 
     total_loss = 0.0
 

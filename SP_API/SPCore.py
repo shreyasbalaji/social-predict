@@ -30,12 +30,15 @@ dla = ['relu', 'relu', 'relu', 'relu', 'softmax']
 eld = [384, 60, 10]
 ela = ['relu', 'relu', 'sigmoid']
 
+BATCH_SIZE = 50
+LEARNING_RATE = 0.001
 IMG_DIM = 300
 
 
+
 class SPCore():
-    def __init__(self, img_dim=IMG_DIM, ckpt_path=CKPT_PATH, primary_layer_dims=pld, primary_layer_activations=pla,
-                 deep_layer_dims=dld, deep_layer_activations=dla, embedding_layer_dims=eld, embedding_layer_activations=ela, verbose=0, restore_mode=True, bsz = 50):
+    def __init__(self, bsz=BATCH_SIZE, learning_rate=LEARNING_RATE, ckpt_path=CKPT_PATH, img_dim=IMG_DIM, primary_layer_dims=pld, primary_layer_activations=pla,
+                 deep_layer_dims=dld, deep_layer_activations=dla, embedding_layer_dims=eld, embedding_layer_activations=ela, verbose=0, restore_mode=True):
 
         tf.reset_default_graph()
 
@@ -49,8 +52,8 @@ class SPCore():
         #     self.create_placeholders(img_in_dim=img_dim, attribs_in_dim=9, img_out_dim=10,
         #                              attribs_out_dim=10, final_out_dim=1, bsz=self.bsz)
         self.x_img, self.x_attribs, self.x_embs, self.z, self.out_labels = self.create_placeholders(
-                    img_in_dim=img_dim, attribs_in_dim=9, embs_in_dim=384, img_out_dim=10, attribs_out_dim=10,
-                    embs_out_dim = 10, final_out_dim=1, bsz=self.bsz)
+                    img_in_dim=img_dim, attribs_in_dim=pld[0], embs_in_dim=eld[0], img_out_dim=pld[-1], attribs_out_dim=pld[-1],
+                    embs_out_dim = eld[-1], final_out_dim=dld[-1], bsz=self.bsz)
 
 
         self.p_primary, self.n_l_primary = self.initialize_parameters(primary_layer_dims, primary_layer_activations)
@@ -73,8 +76,9 @@ class SPCore():
 
         # Build Optimizer
         self.global_step = tf.Variable(0, trainable=False)
-        self.learning_rate = tf.train.exponential_decay(0.0001, self.global_step, 10000, 0.95,
-                                                    staircase=True)
+        # self.learning_rate = tf.train.exponential_decay(0.0001, self.global_step, 10000, 0.95,
+        #                                             staircase=True)
+        self.learning_rate = learning_rate
         self.opt = tf.train.AdamOptimizer(learning_rate=self.learning_rate)
 
         # Build Metrics
